@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--
+		NOTE:
+		1. You can reference the file in SDK via relative path
+		2. The Control and Widget Should NOT share resources. They will be separated in production.
+		3. You may include any JS framework you want with your Widget and Control folders. However, keep in mind
+		    to keep you plugin as light weight as possible for performance and transport reasons
+	-->
+
+    <!-- You can load helper.css to use our helper classes.
+    <link href="../../../../styles/helper.css" rel="stylesheet">
+    -->
+	
+	<!-- JS -->
+	<script src="../../../../scripts/buildfire.js"></script>
+   
+ 	<!--
+    <script src="../../../../scripts/angular/angular.min.js"></script>
+    <script src="../../../../scripts/angular/ui-bootstrap.min.js"></script>
+
+   <script src="../../../../scripts/jquery/jquery-1.11.2.min.js"></script>
+   -->
+</head>
+<body>
+    <span>if you haven't signed up for juicer.io yet click <a href="https://www.juicer.io/sign-up">here</a> and take advantage of their free tier.</span>
+
+    <br/><br/>
+    <div class="item clearfix row margin-bottom-fifteen">
+        <div class="labels col-md-2 padding-right-zero pull-left">
+            <span title="This is the Url in the browser when you log into Juicer.io">Feed Url</span>
+        </div>
+        <div class="col-md-8 pull-left">
+            <input id="url" placeholder="https://www.juicer.io/feeds/XXX" type="text" class="form-control" onkeyup="delayedSave()" required="" >
+        </div>
+    </div>
+
+    <script>
+
+        urlInput = document.getElementById("url");
+        var tmr;
+        function delayedSave(){
+            if(tmr)clearTimeout(tmr);
+            tmr = setTimeout(save,500);
+
+        }
+
+        function save() {
+            var obj = {url:urlInput.value,feedId:""};
+
+            if(url){
+                var s = obj.url.split('feeds/');
+                if(s.length > 1)
+                    obj.feedId = s[1];
+                else {
+                    console.warn("invalid Url. Aborting save");
+                    return;
+                }
+            }
+
+            buildfire.datastore.save(obj, function(err){
+                if(err)
+                    console.err(err);
+                else
+                    console.log("saved");
+            });
+        }
+
+        buildfire.datastore.get(function(err,result){
+
+            urlInput.value= result.data.url || "";
+        });
+
+
+    </script>
+</body>
+</html>
